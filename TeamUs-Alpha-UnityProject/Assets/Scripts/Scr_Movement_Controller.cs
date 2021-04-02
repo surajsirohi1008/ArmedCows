@@ -46,22 +46,11 @@ public class Scr_Movement_Controller : MonoBehaviour
     private float timeOfCollision;
     public GameObject winTextUI, loseTextUI;
     [SerializeField] private GameObject otherPlayer;
-
-
-
     //shared paramaters
     [HideInInspector] public float driftPercentRead, driftPercentTresholdRead;//read by other scripts
 
-    //[Header("Debug")]
-    // public float velocity;
-    // public float actualRadius;
-    // public float actualRotationsPerSecond;
-    // public float percentTest1, percentTest2;
-
     private void Awake()
-    {
-        driftPercentTresholdRead = driftPercentTreshold;
-    }
+    { driftPercentTresholdRead = driftPercentTreshold; }
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -75,16 +64,11 @@ public class Scr_Movement_Controller : MonoBehaviour
     }
     void Update()
     {
-        // input = Input.GetAxisRaw("Horizontal");//Get Input
-
         input = Input.GetKey(leftKeyCode) ? -1 : Input.GetKey(rightKeyCode) ? 1 : 0;
         driftPercentRead = driftPercent;
-        // velocity = rb.velocity.magnitude;//Debug velocity
-        //actualRotationsPerSecond = rb.angularVelocity.magnitude / (2 * Mathf.PI);//Debug rotations per second
-        // actualRadius = MyState != State.Driving ? rb.velocity.magnitude / rb.angularVelocity.magnitude : 0;//Debug radius
 
         if (!freeze)
-        {
+        {//Set State behavior and transitions
             switch (MyState)
             {
                 case State.Driving:
@@ -106,52 +90,43 @@ public class Scr_Movement_Controller : MonoBehaviour
                     break;
             }
 
-            if (health <= 0 && !freeze)
-            {
-                StartCoroutine(EndGame());
-            }
+            if (health <= 0 && !freeze)//Call EndGame
+            { StartCoroutine(EndGame()); }
         }
-
     }
-
 
     private IEnumerator EndGame()
     {
+        //turn off controls
         freeze = true;
+        //Enable End Game UI
         if (!winTextUI.activeSelf)
-        {
-            loseTextUI.SetActive(true);
-        }
+        {  loseTextUI.SetActive(true); }
         Scr_Movement_Controller otherPlayerScript = otherPlayer.GetComponent<Scr_Movement_Controller>();
         otherPlayerScript.winTextUI.SetActive(true);
+        //wait to reload scene
         yield return new WaitForSeconds(2f);
-
-        //loseTextUI.SetActive(false);
-        //winTextUI.SetActive(false);
-        //otherPlayerScript.winTextUI.SetActive(true);
-        //otherPlayerScript.loseTextUI.SetActive(true);
         freeze = false;
         SceneManager.LoadScene(0);
-
-
     }
     private void KnockedAway()
     {
-        if (Time.time > timeOfCollision + .5f)
-        {
-            MyState = State.Driving;
-        }
+        //Wait for delay to exit state
+        float delay = .5f;
+        if (Time.time > timeOfCollision + delay)
+        {  MyState = State.Driving;}
     }
 
     private void Driving()
     {
+        //Calculate forces
         if (momentum.magnitude > .1f)
         { momentum -= momentum.normalized * 10 * Time.deltaTime; }
         else { momentum = Vector3.zero; }
         float velocityTresholdToDrift = driftPercentTreshold * (maxDriftingVelocity - drivingVelocity) + drivingVelocity;
         if (momentum.magnitude < velocityTresholdToDrift && trailRenderer.emitting)
         { trailRenderer.emitting = false; }
-
+        //Apply forces
         rb.velocity = transform.forward * drivingVelocity + momentum;
     }
     private void Rotating()//Steering and Drifting
@@ -175,8 +150,7 @@ public class Scr_Movement_Controller : MonoBehaviour
         driftPercent = Mathf.Clamp(rotationLifeTime / timeToMaxDrift, 0f, 1f);
         driftPower = Mathf.Clamp((rotationLifeTime - timeToMaxDrift * driftPercentTreshold) / (timeToMaxDrift - timeToMaxDrift * driftPercentTreshold), 0, 1);
 
-
-
+        //Apply forces
         rb.velocity = transform.forward * Mathf.Lerp(drivingVelocity, maxDriftingVelocity, driftingVelocityCurve.Evaluate(driftPercent)) + momentum;
         float angularFrequency = rb.velocity.magnitude / (radiusCurve.Evaluate(driftPercent) * maxRadius);
         rb.angularVelocity = transform.up * angularFrequency * driftingDirection;
@@ -209,10 +183,10 @@ public class Scr_Movement_Controller : MonoBehaviour
         trailRenderer.emitting = false;
         MyState = State.Driving;
     }
+
     private void TriggerShot()
-    {
-        scr_Shooting_Controller.Shoot(driftPower);
-    }
+    {   scr_Shooting_Controller.Shoot(driftPower); }
+
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.layer != LayerMask.NameToLayer("Ground"))
@@ -232,19 +206,13 @@ public class Scr_Movement_Controller : MonoBehaviour
         if (collision.gameObject.layer == LayerMask.NameToLayer("Damage"))
         {
             health -= 1;
-            //Destroy(collision.gameObject);
             AnalyticsResult result = Analytics.CustomEvent("Got Shot");
 
             // Send event
-
             if (result == AnalyticsResult.Ok)
-            {
-                print("Event Sent");
-            }
+            {print("Event Sent");  }
             else
-            {
-                print("Event Not Sent");
-            }
+            {   print("Event Not Sent"); }
         }
     }
 }

@@ -13,6 +13,7 @@ public class Scr_HealthUI_Controller : MonoBehaviour
     private float health;
     void Start()
     {
+        //Set UI Box size a
         box.rectTransform.sizeDelta = new Vector2(widthInPixels, heightInPixels);
         fill.rectTransform.sizeDelta = new Vector2(widthInPixels, heightInPixels);
         maxHealth = scr_Movement_Controller.health;
@@ -20,7 +21,8 @@ public class Scr_HealthUI_Controller : MonoBehaviour
 
     void Update()
     {
-        health = scr_Movement_Controller.health;
-        fill.rectTransform.sizeDelta = new Vector2(widthInPixels * (health / maxHealth), heightInPixels);
+        //Update Health Bat
+        health = scr_Movement_Controller.health;//Get player's health
+        fill.rectTransform.sizeDelta = new Vector2(widthInPixels * (health / maxHealth), heightInPixels);//Set Fill
     }
 }

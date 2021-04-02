@@ -24,7 +24,7 @@ public class Scr_DriftPowerUI_Controller : MonoBehaviour
         float box0Width = boxesWidthInPixels * percentTreshold;
         float otherBoxWidth = (boxesWidthInPixels - box0Width) / (boxes.Count - 1);
         boxes[0].rectTransform.sizeDelta = new Vector2(box0Width, heightInPixels * .3f);
-        for (int i = 1; i < boxes.Count; i++)
+        for (int i = 1; i < boxes.Count; i++)//Set position and size for each box
         {
             boxes[i].rectTransform.sizeDelta = new Vector2(otherBoxWidth, heightInPixels);
             boxes[i].rectTransform.localPosition = new Vector2(i * spacingInPixels + (i - 1) * otherBoxWidth + box0Width, 0);
@@ -32,18 +32,20 @@ public class Scr_DriftPowerUI_Controller : MonoBehaviour
     }
     void Update()
     {
+        //Set fill for each box
         percent = scr_Movement_Controller.driftPercentRead;
-        for (int i = 0; i < boxes.Count; i++)//Fill in masks according to drifting percentage
+        for (int i = 0; i < boxes.Count; i++)//Fill in each box according to drifting percentage
         {
+            //Get box
             Image fill = boxes[i].transform.GetChild(0).GetComponent<Image>();
             float startPosInPixels = boxes[i].rectTransform.localPosition.x;
             Vector2 fillScaleInPixels = new Vector2(boxes[i].rectTransform.rect.width, boxes[i].rectTransform.rect.height);
-
+            //Calculate size 
             float boxPercentStart = (startPosInPixels / totalWidthInPixels);
             float boxPercentEnd = (startPosInPixels + fillScaleInPixels.x) / totalWidthInPixels;
             float myPercent = Mathf.Clamp((percent - boxPercentStart) / (boxPercentEnd - boxPercentStart), 0, 1);
             float width = Mathf.Lerp(0, fillScaleInPixels.x, myPercent);
-
+            //Set size
             fill.rectTransform.sizeDelta = new Vector2(width, fillScaleInPixels.y);
         }
     }
