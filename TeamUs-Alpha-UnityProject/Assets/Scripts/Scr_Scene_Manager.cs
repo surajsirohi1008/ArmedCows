@@ -7,9 +7,8 @@ public class Scr_Scene_Manager : MonoBehaviour
 {
     void Update()
     {
+        //Reload Scene on input press
         if (Input.GetKeyDown(KeyCode.R))
-        {
-            SceneManager.LoadScene(0);
-        }
+        {   SceneManager.LoadScene(0); }
     }
 }
