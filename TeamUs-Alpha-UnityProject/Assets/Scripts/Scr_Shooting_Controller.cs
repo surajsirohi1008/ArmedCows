@@ -25,7 +25,16 @@ public class Scr_Shooting_Controller : MonoBehaviour
     }
     public void Shoot(float percent)
     {
+        if (percent > 0 && percent < 33.33f)
+            Analytics.CustomEvent("Shot Level: " + 1);
+        else if (percent > 33.33f && percent < 66.66f)
+            Analytics.CustomEvent("Shot Level: " + 2);
+        else if (percent > 66.66f)
+            Analytics.CustomEvent("Shot Level: " + 3);
+
         StartCoroutine(ShootACoroutine(percent));
+
+
         //switch (currentGun)
         //{
         //    case 0:
@@ -47,7 +56,7 @@ public class Scr_Shooting_Controller : MonoBehaviour
 
     IEnumerator ShootACoroutine(float percent) //3 weak but rapid shots
     {
-        int shots = (int)(percent * 3f)+1;
+        int shots = (int)(percent * 3f) + 1;
         while (shots > 0)
         {
             GameObject newProjectile = Instantiate(projectilePrefab, shooterObj.transform.position, shooterObj.transform.rotation, temporaryStorage);

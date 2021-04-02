@@ -6,7 +6,7 @@ using UnityEngine.Analytics;
 
 public class Scr_Movement_Controller : MonoBehaviour
 {
-    public static bool freeze =false;
+    public static bool freeze = false;
     private enum State { Driving, Steering, Drifting, KnockedAway };
     [SerializeField] private State MyState;
 
@@ -123,7 +123,7 @@ public class Scr_Movement_Controller : MonoBehaviour
             loseTextUI.SetActive(true);
         }
         Scr_Movement_Controller otherPlayerScript = otherPlayer.GetComponent<Scr_Movement_Controller>();
-        otherPlayerScript.winTextUI.SetActive(true); 
+        otherPlayerScript.winTextUI.SetActive(true);
         yield return new WaitForSeconds(2f);
 
         //loseTextUI.SetActive(false);
@@ -176,6 +176,7 @@ public class Scr_Movement_Controller : MonoBehaviour
         driftPower = Mathf.Clamp((rotationLifeTime - timeToMaxDrift * driftPercentTreshold) / (timeToMaxDrift - timeToMaxDrift * driftPercentTreshold), 0, 1);
 
 
+
         rb.velocity = transform.forward * Mathf.Lerp(drivingVelocity, maxDriftingVelocity, driftingVelocityCurve.Evaluate(driftPercent)) + momentum;
         float angularFrequency = rb.velocity.magnitude / (radiusCurve.Evaluate(driftPercent) * maxRadius);
         rb.angularVelocity = transform.up * angularFrequency * driftingDirection;
@@ -224,6 +225,8 @@ public class Scr_Movement_Controller : MonoBehaviour
             rb.velocity = Vector3.zero;
             momentum = Vector3.zero;
             rb.AddForce(knockedAwayDir * 20f, ForceMode.Impulse);
+
+            Analytics.CustomEvent("Hit Obstacle");
         }
 
         if (collision.gameObject.layer == LayerMask.NameToLayer("Damage"))
@@ -233,7 +236,7 @@ public class Scr_Movement_Controller : MonoBehaviour
             AnalyticsResult result = Analytics.CustomEvent("Got Shot");
 
             // Send event
-         
+
             if (result == AnalyticsResult.Ok)
             {
                 print("Event Sent");
