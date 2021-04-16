@@ -51,6 +51,9 @@ public class Scr_Movement_Controller : MonoBehaviour
 
     int movingDirection;
 
+    [SerializeField]
+    bool useDownArrowKey;
+
     private void Awake()
     { driftPercentTresholdRead = driftPercentTreshold; }
     void Start()
@@ -96,7 +99,10 @@ public class Scr_Movement_Controller : MonoBehaviour
             { StartCoroutine(EndGame()); }
         }
 
-        movingDirection = Input.GetKey(KeyCode.S) ? -1 : 1;
+        if (useDownArrowKey)
+            movingDirection = Input.GetKey(KeyCode.DownArrow) ? -1 : 1;
+        else
+            movingDirection = Input.GetKey(KeyCode.S) ? -1 : 1;
     }
 
     private IEnumerator EndGame()
@@ -130,8 +136,10 @@ public class Scr_Movement_Controller : MonoBehaviour
         float velocityTresholdToDrift = driftPercentTreshold * (maxDriftingVelocity - drivingVelocity) + drivingVelocity;
         if (momentum.magnitude < velocityTresholdToDrift && trailRenderer.emitting)
         { trailRenderer.emitting = false; }
+
         //Apply forces
         rb.velocity = transform.forward * drivingVelocity * movingDirection + momentum;
+
     }
     private void Rotating()//Steering and Drifting
     {
