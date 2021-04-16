@@ -49,6 +49,8 @@ public class Scr_Movement_Controller : MonoBehaviour
     //shared paramaters
     [HideInInspector] public float driftPercentRead, driftPercentTresholdRead;//read by other scripts
 
+    int movingDirection;
+
     private void Awake()
     { driftPercentTresholdRead = driftPercentTreshold; }
     void Start()
@@ -93,6 +95,8 @@ public class Scr_Movement_Controller : MonoBehaviour
             if (health <= 0 && !freeze)//Call EndGame
             { StartCoroutine(EndGame()); }
         }
+
+        movingDirection = Input.GetKey(KeyCode.S) ? -1 : 1;
     }
 
     private IEnumerator EndGame()
@@ -101,7 +105,7 @@ public class Scr_Movement_Controller : MonoBehaviour
         freeze = true;
         //Enable End Game UI
         if (!winTextUI.activeSelf)
-        {  loseTextUI.SetActive(true); }
+        { loseTextUI.SetActive(true); }
         Scr_Movement_Controller otherPlayerScript = otherPlayer.GetComponent<Scr_Movement_Controller>();
         otherPlayerScript.winTextUI.SetActive(true);
         //wait to reload scene
@@ -114,7 +118,7 @@ public class Scr_Movement_Controller : MonoBehaviour
         //Wait for delay to exit state
         float delay = .5f;
         if (Time.time > timeOfCollision + delay)
-        {  MyState = State.Driving;}
+        { MyState = State.Driving; }
     }
 
     private void Driving()
@@ -127,7 +131,7 @@ public class Scr_Movement_Controller : MonoBehaviour
         if (momentum.magnitude < velocityTresholdToDrift && trailRenderer.emitting)
         { trailRenderer.emitting = false; }
         //Apply forces
-        rb.velocity = transform.forward * drivingVelocity + momentum;
+        rb.velocity = transform.forward * drivingVelocity * movingDirection + momentum;
     }
     private void Rotating()//Steering and Drifting
     {
@@ -185,7 +189,7 @@ public class Scr_Movement_Controller : MonoBehaviour
     }
 
     private void TriggerShot()
-    {   scr_Shooting_Controller.Shoot(driftPower); }
+    { scr_Shooting_Controller.Shoot(driftPower); }
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -210,9 +214,9 @@ public class Scr_Movement_Controller : MonoBehaviour
 
             // Send event
             if (result == AnalyticsResult.Ok)
-            {print("Event Sent");  }
+            { print("Event Sent"); }
             else
-            {   print("Event Not Sent"); }
+            { print("Event Not Sent"); }
         }
     }
 }
